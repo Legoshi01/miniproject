@@ -15,7 +15,8 @@ Future<UserCredential?> registerUser(name, company, email, password) async {
     CollectionReference users = FirebaseFirestore.instance.collection('Users');
 
     users
-        .add({
+        .doc(userCredential.user!.uid)
+        .set({
           'full_name': name,
           'company': company,
         })

@@ -1,8 +1,15 @@
+import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 import '../clinic/event.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import '../services/auth_service.dart';
 
 class homePage extends StatefulWidget {
   const homePage({Key? key}) : super(key: key);
@@ -21,6 +28,8 @@ class _homePageState extends State<homePage> {
   CalendarFormat format = CalendarFormat.month;
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
+  // String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(focusedDay);
+  // DateTime focusedDay = DateFormat.;
 
   final TextEditingController _event = TextEditingController();
   final TextEditingController _name = TextEditingController();
@@ -45,7 +54,10 @@ class _homePageState extends State<homePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Clinic Booking"),
+        title: Text(
+          "Clinic Booking",
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ),
         centerTitle: true,
       ),
       body: Container(
@@ -82,13 +94,13 @@ class _homePageState extends State<homePage> {
               calendarStyle: CalendarStyle(
                 isTodayHighlighted: true,
                 selectedDecoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Color.fromARGB(255, 109, 74, 204),
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 selectedTextStyle: TextStyle(color: Colors.white),
                 todayDecoration: BoxDecoration(
-                  color: Colors.purpleAccent,
+                  color: Color.fromARGB(255, 92, 255, 230),
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(5.0),
                 ),
@@ -114,63 +126,91 @@ class _homePageState extends State<homePage> {
                 ),
               ),
             ),
-            // ..._getEventsfromDay(selectedDay).map(
-            //   (Event event) => ListTile(
-            //     title: Text(
-            //       event.title,
-            //     ),
-            //   ),
-            // ),
+            ..._getEventsfromDay(selectedDay).map(
+              (Event event) => ListTile(
+                title: Text(
+                  event.title,
+                ),
+              ),
+            ),
             showList(),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Add Event"),
-            content: TextFormField(
-              controller: _event,
-            ),
-            actions: [
-              TextButton(
-                child: Text("Cancel"),
-                onPressed: () => Navigator.pop(context),
-              ),
-              TextButton(
-                child: Text("Ok"),
-                onPressed: () {
-                  if (_event.text.isEmpty) {
-                  } else {
-                    if (salectedEvents[selectedDay] != null) {
-                      salectedEvents[selectedDay]?.add(
-                        Event(title: _event.text),
-                      );
-                    } else {
-                      salectedEvents[selectedDay] = [Event(title: _event.text)];
-                    }
-                    // print(_event);
-                    createBookings();
-                  }
+          onPressed: () => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Add Event"),
+                  // titleTextStyle: TextStyle(color: Colors.white),
+                  content: TextFormField(
+                    controller: _event,
+                  ),
+                  actions: [
+                    TextButton(
+                      child: Text("Cancel"),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    TextButton(
+                      child: Text("Ok"),
+                      onPressed: () {
+                        if (_event.text.isEmpty) {
+                        } else {
+                          if (salectedEvents[selectedDay] != null) {
+                            // salectedEvents[selectedDay]?.add(
+                            //   Event(title: _event.text),
+                            // );
+                          } else {
+                            salectedEvents[selectedDay] = [
+                              Event(title: _event.text)
+                            ];
+                          }
+                          createBookings();
+                          getData();
+                        }
 
-                  Navigator.pop(context);
-                  _event.clear();
-                  setState(() {});
-                  return;
-                },
+                        Navigator.pop(context);
+                        _event.clear();
+                        setState(() {});
+                        return;
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ],
+          label: Text(
+            "Add Event",
+            style: GoogleFonts.itim(
+                textStyle: TextStyle(
+                    color: Color.fromARGB(255, 255, 255, 255), fontSize: 18)),
           ),
-        ),
-        label: Text("Add Event"),
-        icon: Icon(Icons.add),
-      ),
+          icon: Icon(Icons.add)),
     );
   }
 
+  // Future<void> createBookings() async {
+  //   final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+  //   final GoogleSignInAuthentication? googleAuth =
+  //       await googleUser?.authentication;
+  //   // Call the user's CollectionReference to add a new user
+  //   final credential = GoogleAuthProvider.credential(
+  //     accessToken: googleAuth?.accessToken,
+  //     idToken: googleAuth?.idToken,
+  //   );
+  //   UserCredential userCredential = await auth.signInWithCredential(credential);
+  //   print(userCredential.user);
+  //   return await bookings
+  //       .doc(userCredential.user!.uid)
+  //       .set({
+  //         'service': _event.text,
+  //         'date_time': selectedDay.toString()
+  //         // John Doe
+  //       })
+  //       .then((value) => print("User Bookings"))
+  //       .catchError((error) => print("Failed to add user: $error"));
+  // }
+
   Future<void> createBookings() async {
-    // Call the user's CollectionReference to add a new user
     return await bookings
         .add({
           'service': _event.text,
@@ -178,8 +218,27 @@ class _homePageState extends State<homePage> {
 
           // John Doe
         })
-        .then((value) => print("User Bookings"))
+        .then((value) => print("Bookings Complete"))
         .catchError((error) => print("Failed to add user: $error"));
+  }
+
+  Future<void> getData() async {
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot = await bookings.get();
+
+    // Get data from docs and convert map to List
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    for (int i = 0; i < querySnapshot.size; i++) {
+      // var a = allData[i];
+      // print(a.documentID);
+      // salectedEvents[selectedDay] = [Event(title: _event.text)];
+
+      print(allData[i]);
+      // print('${{a}.['service']}');
+    }
+
+    // print(allData);
   }
 
   Widget showList() {
@@ -199,45 +258,11 @@ class _homePageState extends State<homePage> {
                 Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
                 return Card(
                   child: ListTile(
-                    // onTap: () {
-                    //   // Navigate to Edit Product
-
-                    //   Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) => EditProductPage(id: doc.id),
-                    //       )).then((value) => setState(() {}));
-                    // },
-
                     title: Text('${data['service']}'),
                     subtitle: Text('${data['date_time']}'),
-                    trailing: IconButton(
-                      onPressed: () {
-                        // Create Alert Dialog
-                        var alertDialog = AlertDialog(
-                          title: const Text('Delete Product Confirmation'),
-                          content: Text(
-                              'คุณต้องการลบสินค้า ${data['product_name']} ใช่หรือไม่'),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('ยกเลิก')),
-                            TextButton(
-                                onPressed: () {}, child: const Text('ยืนยัน')),
-                          ],
-                        );
-                        // Show Alert Dialog
-                        showDialog(
-                            context: context,
-                            builder: (context) => alertDialog);
-                      },
-                      icon: const Icon(
-                        Icons.delete_forever,
-                        color: Colors.red,
-                      ),
-                    ),
                   ),
                 );
+                // ignore: dead_code
               }).toList(),
             ),
           ];

@@ -28,9 +28,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Form(
         key: _formKey,
         child: ListView(children: [
+          Image.asset(
+            'images/logo2.png',
+            width: 50,
+          ),
           inputEmail(),
           inputPassword(),
           formButton(),
@@ -47,6 +52,12 @@ class _LoginPageState extends State<LoginPage> {
               });
             },
             darkMode: false, // if true second example
+            // isLoading: isLoading,
+            style: AuthButtonStyle(
+              iconColor: Color.fromARGB(255, 92, 255, 230),
+              // buttonType: ,
+              // iconType: iconType,
+            ),
           ),
         ]),
       ),
@@ -120,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
   Container inputEmail() {
     return Container(
       width: 250,
-      margin: const EdgeInsets.only(left: 32, right: 32, top: 32, bottom: 8),
+      margin: const EdgeInsets.only(left: 32, right: 32, top: 0, bottom: 8),
       child: TextFormField(
         controller: _email,
         keyboardType: TextInputType.emailAddress,
@@ -133,11 +144,13 @@ class _LoginPageState extends State<LoginPage> {
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide:
+                BorderSide(color: Color.fromARGB(255, 92, 255, 230), width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide:
+                BorderSide(color: Color.fromARGB(255, 92, 255, 230), width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -145,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           prefixIcon: Icon(
             Icons.email,
-            color: Colors.blue,
+            color: Color.fromARGB(255, 92, 255, 230),
           ),
           label: Text(
             'E-mail',
@@ -172,11 +185,13 @@ class _LoginPageState extends State<LoginPage> {
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide:
+                BorderSide(color: Color.fromARGB(255, 92, 255, 230), width: 2),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide(color: Colors.blue, width: 2),
+            borderSide:
+                BorderSide(color: Color.fromARGB(255, 92, 255, 230), width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -184,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           prefixIcon: Icon(
             Icons.lock,
-            color: Colors.blue,
+            color: Color.fromARGB(255, 92, 255, 230),
           ),
           label: Text(
             'Password',
