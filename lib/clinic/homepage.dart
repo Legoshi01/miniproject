@@ -28,6 +28,8 @@ class _homePageState extends State<homePage> {
   late Map<DateTime, List<Event>> salectedEvents;
 
   CalendarFormat format = CalendarFormat.month;
+  final dateFormat = DateFormat('EEEE dd-MMMM-yyyy ');
+  // final dateFormat =
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
   // String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(focusedDay);
@@ -85,7 +87,7 @@ class _homePageState extends State<homePage> {
                   selectedDay = selectDay;
                   focusedDay = focusDay;
                 });
-                print(focusedDay);
+                print(dateFormat.format(focusedDay));
               },
               selectedDayPredicate: (DateTime date) {
                 return isSameDay(selectedDay, date);
@@ -97,23 +99,23 @@ class _homePageState extends State<homePage> {
               calendarStyle: CalendarStyle(
                 isTodayHighlighted: true,
                 selectedDecoration: BoxDecoration(
-                  color: Color.fromARGB(255, 109, 74, 204),
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5.0),
+                  color: Color.fromARGB(255, 79, 211, 196),
+                  shape: BoxShape.circle,
+                  // borderRadius: BorderRadius.circular(5.0),
                 ),
                 selectedTextStyle: TextStyle(color: Colors.white),
                 todayDecoration: BoxDecoration(
-                  color: Color.fromARGB(255, 92, 255, 230),
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5.0),
+                  color: Color.fromARGB(255, 8, 94, 125),
+                  shape: BoxShape.circle,
+                  // borderRadius: BorderRadius.circular(5.0),
                 ),
                 defaultDecoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5.0),
+                  shape: BoxShape.circle,
+                  // borderRadius: BorderRadius.circular(5.0),
                 ),
                 weekendDecoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(5.0),
+                  shape: BoxShape.circle,
+                  // borderRadius: BorderRadius.circular(5.0),
                 ),
               ),
               headerStyle: HeaderStyle(
@@ -121,7 +123,7 @@ class _homePageState extends State<homePage> {
                 titleCentered: true,
                 formatButtonShowsNext: false,
                 formatButtonDecoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: Color.fromARGB(255, 63, 83, 99),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 formatButtonTextStyle: TextStyle(
@@ -184,11 +186,12 @@ class _homePageState extends State<homePage> {
               ),
           label: Text(
             "Add Event",
-            style: GoogleFonts.itim(
-                textStyle: TextStyle(
-                    color: Color.fromARGB(255, 255, 255, 255), fontSize: 18)),
+            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
           ),
-          icon: Icon(Icons.add)),
+          icon: Icon(
+            Icons.add,
+            color: Colors.white,
+          )),
     );
   }
 
@@ -218,7 +221,7 @@ class _homePageState extends State<homePage> {
     return await bookings
         .add({
           'service': _event.text,
-          'date_time': selectedDay.toString()
+          'date_time': dateFormat.format(selectedDay).toString()
 
           // John Doe
         })
@@ -277,7 +280,7 @@ class _homePageState extends State<homePage> {
         salectedEvents[conDate] = [Event(title: serv[i])];
       }
 
-      print(serv[i].toString());
+      // print(serv[i].toString());
     }
     setState(() {});
   }

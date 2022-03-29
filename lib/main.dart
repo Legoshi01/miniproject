@@ -1,11 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_file.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import '';
 
 import 'clinic/login.dart';
 import 'clinic/homepage.dart';
 
 void main() async {
+  // Intl.defaultLocale = "th";
+
+  // initializeDateFormatting();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
@@ -21,8 +27,9 @@ class MyApp extends StatelessWidget {
       title: 'App Products',
       theme: ThemeData(
           // primarySwatch: Colors.blue,
-          primarySwatch: createMaterialColor(Color(0xFF5ce1e6))),
+          primarySwatch: createMaterialColor(Color(0xFF4FD3C4))),
       debugShowCheckedModeBanner: false,
+      // home: const LoginPage(),
       home: const homePage(),
     );
   }
