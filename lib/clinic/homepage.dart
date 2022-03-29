@@ -1,3 +1,5 @@
+// import 'dart:html';
+
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
@@ -39,6 +41,7 @@ class _homePageState extends State<homePage> {
     // TODO: implement initState
     salectedEvents = {};
     super.initState();
+    realgetdata();
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
@@ -157,16 +160,17 @@ class _homePageState extends State<homePage> {
                         if (_event.text.isEmpty) {
                         } else {
                           if (salectedEvents[selectedDay] != null) {
-                            // salectedEvents[selectedDay]?.add(
-                            //   Event(title: _event.text),
-                            // );
+                            salectedEvents[selectedDay]?.add(
+                              Event(title: _event.text),
+                            );
                           } else {
                             salectedEvents[selectedDay] = [
                               Event(title: _event.text)
                             ];
                           }
+
+                          // realgetdata();
                           createBookings();
-                          getData();
                         }
 
                         Navigator.pop(context);
@@ -222,23 +226,60 @@ class _homePageState extends State<homePage> {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  Future<void> getData() async {
-    // Get docs from collection reference
+  // Future<void> getData() async {
+  //   // Get docs from collection reference
+  //   QuerySnapshot querySnapshot = await bookings.get();
+
+  //   // Get data from docs and convert map to List
+  //   final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+  //   for (int i = 0; i < querySnapshot.size; i++) {
+  //     // var a = allData[i];
+  //     // print(a.documentID);
+  //     salectedEvents[selectedDay] = [Event(title: _event.text)];
+
+  //     print(allData[i]);
+  //     // print('${{a}.['service']}');
+  //   }
+
+  //   // print(allData);
+  // }
+
+  // Future<void> getdata() async {
+  //   // Get docs from collection reference
+  //   QuerySnapshot querySnapshot = await bookings.get();
+
+  //   // Get data from docs and convert map to List
+  //   final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+  //   //for a specific field
+  //   final Data = querySnapshot.docs.map((doc) => doc.get('service')).toList();
+  //   for (int i = 0; i < querySnapshot.size; i++) {
+  //     print(Data[i]);
+  //   }
+  //   // print(Data);
+  // }
+
+  Future<void> realgetdata() async {
     QuerySnapshot querySnapshot = await bookings.get();
 
-    // Get data from docs and convert map to List
-    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    // final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    var date = querySnapshot.docs.map((doc) => doc.get('date_time')).toList();
+    final serv = querySnapshot.docs.map((doc) => doc.get('service')).toList();
+    // var datetime = DateTime.parse(date);
 
     for (int i = 0; i < querySnapshot.size; i++) {
-      // var a = allData[i];
-      // print(a.documentID);
-      // salectedEvents[selectedDay] = [Event(title: _event.text)];
+      DateTime conDate = DateTime.parse(date[i].toString());
+      if (salectedEvents[conDate] != null) {
+        salectedEvents[conDate]?.add(
+          Event(title: serv[i]),
+        );
+      } else {
+        salectedEvents[conDate] = [Event(title: serv[i])];
+      }
 
-      print(allData[i]);
-      // print('${{a}.['service']}');
+      print(serv[i].toString());
     }
-
-    // print(allData);
+    setState(() {});
   }
 
   Widget showList() {
