@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import '../models/service_list.dart';
+import '../models/service_list.dart';
 import '../services/auth_service.dart';
 import 'login.dart';
 
@@ -20,6 +21,10 @@ class homePage extends StatefulWidget {
   @override
   State<homePage> createState() => _homePageState();
 }
+
+List<Listservice> dropdownItems = Listservice.getListservice();
+late List<DropdownMenuItem<Listservice>> dropdownMenuItems;
+late Listservice _selectedType;
 
 class _homePageState extends State<homePage> {
   // ignore: non_constant_identifier_names
@@ -40,14 +45,30 @@ class _homePageState extends State<homePage> {
   // String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(focusedDay);
   // DateTime focusedDay = DateFormat.;
 
-  final TextEditingController _event = TextEditingController();
-  final TextEditingController _name = TextEditingController();
+  TextEditingController _event = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
+
+    List<DropdownMenuItem<Listservice>> createDropdownMenu(
+        List<Listservice> dropdownItems) {
+      List<DropdownMenuItem<Listservice>> items = [];
+
+      for (var item in dropdownItems) {
+        items.add(DropdownMenuItem(
+          child: Text(item.name!),
+          value: item,
+        ));
+      }
+
+      return items;
+    }
+
     salectedEvents = {};
     super.initState();
+    dropdownMenuItems = createDropdownMenu(dropdownItems);
+    _selectedType = dropdownMenuItems[0].value!;
     realgetdata();
   }
 
@@ -128,21 +149,17 @@ class _homePageState extends State<homePage> {
                 selectedDecoration: BoxDecoration(
                   color: Color.fromARGB(255, 79, 211, 196),
                   shape: BoxShape.circle,
-                  // borderRadius: BorderRadius.circular(5.0),
                 ),
                 selectedTextStyle: TextStyle(color: Colors.white),
                 todayDecoration: BoxDecoration(
                   color: Color.fromARGB(255, 8, 94, 125),
                   shape: BoxShape.circle,
-                  // borderRadius: BorderRadius.circular(5.0),
                 ),
                 defaultDecoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  // borderRadius: BorderRadius.circular(5.0),
                 ),
                 weekendDecoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  // borderRadius: BorderRadius.circular(5.0),
                 ),
               ),
               headerStyle: HeaderStyle(
@@ -159,13 +176,86 @@ class _homePageState extends State<homePage> {
               ),
             ),
             ..._getEventsfromDay(selectedDay).map(
-              (Event event) => ListTile(
+              (Event _selectedType) => ListTile(
                 title: Text(
-                  event.title,
+                  _selectedType.title,
                 ),
               ),
             ),
             // showList(),
+          ],
+        ),
+      ),
+      drawer: Drawer(
+        // backgroundColor: Colors.white,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 79, 211, 196),
+              ),
+              child: Text(
+                user.displayName.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            // Text(user.displayName.toString(),
+            //     style: TextStyle(
+            //       color: Colors.black,
+            //       fontSize: 24,
+            //     )),
+            ListTile(
+                leading: Icon(
+                  Icons.logout,
+                  color: Color.fromARGB(255, 79, 211, 196),
+                ),
+                title: Text('Logout'),
+                onTap: () {
+                  googleSignOut().then((value) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
+                  });
+                }),
+            // ListTile(
+            //   leading: Icon(Icons.library_books_rounded),
+            //   title: Text('ItemCalories'),
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => const ItemCalories(),
+            //         )).then((value) => setState(() {}));
+            //   },
+            // ),
+            // ListTile(
+            //   leading: Icon(Icons.login_outlined),
+            //   title: Text('log Out'),
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => const LoginPage(),
+            //         )).then((value) => setState(() {}));
+            //   },
+            // ),
+            // const Divider(),
+            // // Expanded(
+            // //   child: Align(
+            // //     alignment: Alignment.bottomLeft,
+            // //     child: ListTile(
+            // //       title: Text('Item 3'),
+            // //       onTap: () {},
+            // //     ),
+            // //   ),
+            // // ),
           ],
         ),
       ),
@@ -174,9 +264,17 @@ class _homePageState extends State<homePage> {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: Text("Add Event"),
-                  // titleTextStyle: TextStyle(color: Colors.white),
-                  content: TextFormField(
-                    controller: _event,
+                  content: DropdownButton(
+                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                    value: _selectedType,
+                    items: dropdownMenuItems,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedType = value as Listservice;
+                        print(_selectedType.name);
+                        setState(() {});
+                      });
+                    },
                   ),
                   actions: [
                     TextButton(
@@ -186,23 +284,26 @@ class _homePageState extends State<homePage> {
                     TextButton(
                       child: Text("Ok"),
                       onPressed: () {
-                        if (_event.text.isEmpty) {
+                        if (_selectedType.name.toString().isEmpty) {
+                          // print(
+                          // 'มาแล้วววววว ไม่เข้า comminggggggggggggggggggg');
                         } else {
                           if (salectedEvents[selectedDay] != null) {
                             salectedEvents[selectedDay]?.add(
-                              Event(title: _event.text),
+                              Event(title: _selectedType.name.toString()),
                             );
                           } else {
                             salectedEvents[selectedDay] = [
-                              Event(title: _event.text)
+                              Event(title: _selectedType.name.toString())
                             ];
                           }
                           createBookings();
+                          // print('มาแล้วววววว comminggggggggggggggggggg');
                           // realgetdata();
                         }
 
                         Navigator.pop(context);
-                        _event.clear();
+                        // _event.clear();
                         setState(() {});
                         return;
                       },
@@ -221,34 +322,13 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  // Future<void> createBookings() async {
-  //   final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-  //   final GoogleSignInAuthentication? googleAuth =
-  //       await googleUser?.authentication;
-  //   // Call the user's CollectionReference to add a new user
-  //   final credential = GoogleAuthProvider.credential(
-  //     accessToken: googleAuth?.accessToken,
-  //     idToken: googleAuth?.idToken,
-  //   );
-  //   UserCredential userCredential = await auth.signInWithCredential(credential);
-  //   print(userCredential.user);
-  //   return await bookings
-  //       .doc(userCredential.user!.uid)
-  //       .set({
-  //         'service': _event.text,
-  //         'date_time': selectedDay.toString()
-  //         // John Doe
-  //       })
-  //       .then((value) => print("User Bookings"))
-  //       .catchError((error) => print("Failed to add user: $error"));
-  // }
-
   Future<void> createBookings() async {
+    // _event = _selectedType.value.toString() as TextEditingController;
     //  QuerySnapshot querySnapshot = await bookings.get();
     // final name = querySnapshot.docs.map((doc) => doc.get('name')).toList();
     return await bookings
         .add({
-          'service': _event.text,
+          'service': _selectedType.name.toString(),
           'date_time': selectedDay.toString(),
           'booker': user.displayName, 'id': user.uid
 
@@ -257,6 +337,7 @@ class _homePageState extends State<homePage> {
           // John Doe
         })
         .then((value) => print("Bookings Complete"))
+        // .then((value) => print(_selectedType.name.toString()))
         .catchError((error) => print("Failed to add user: $error"));
   }
 
@@ -282,20 +363,6 @@ class _homePageState extends State<homePage> {
 
     // print(allData);
   }
-
-  // Future<void> getdata() async {
-  //   // Get docs from collection reference
-  //   QuerySnapshot querySnapshot = await bookings.get();
-
-  //   // Get data from docs and convert map to List
-  //   final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-  //   //for a specific field
-  //   final Data = querySnapshot.docs.map((doc) => doc.get('service')).toList();
-  //   for (int i = 0; i < querySnapshot.size; i++) {
-  //     print(Data[i]);
-  //   }
-  //   // print(Data);
-  // }
 
   Future<void> realgetdata() async {
     QuerySnapshot querySnapshot = await bookings.get();

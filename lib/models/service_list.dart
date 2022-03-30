@@ -4,11 +4,11 @@ class Listservice {
 
   Listservice(this.value, this.name);
 
-  static List<Listservice> getListProductType() {
+  static List<Listservice> getListservice() {
     return [
-      Listservice(1, 'โทรศัพท์มือถือ'),
-      Listservice(2, 'สมาร์ททีวี'),
-      Listservice(3, 'แท็บเล็ต'),
+      Listservice(1, 'ขัดหินปูน'),
+      Listservice(2, 'ดัดฟัน'),
+      Listservice(3, 'ถอนฟัน'),
     ];
   }
 }

@@ -62,10 +62,60 @@ List<DropdownMenuItem<Listservice>> createDropdownMenu(
 
 // final TextEditingController _username
 class _addBookingState extends State<addBooking> {
+  
+  CollectionReference bookings =
+      FirebaseFirestore.instance.collection('Bookings');
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [],
+      children: [
+        Container(
+      width: 250,
+      margin: const EdgeInsets.only(left: 32, right: 32, top: 8, bottom: 8),
+      child: DropdownButton(
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
+        value: _selectedType,
+        items: dropdownMenuItems,
+        onChanged: (value) {
+          setState(() {
+            _selectedType = value as Listservice;
+          });
+        },
+      ),
+    ),
+    Container(
+      width: 150,
+      height: 40,
+      margin: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+      child: ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
+            ),
+          ),
+        ),
+        onPressed: createBookings,
+        child: const Text('บันทึกข้อมูล'),
+      ),
+    )
+    ],
     );
+  }
+   Future<void> createBookings() async {
+    //  QuerySnapshot querySnapshot = await bookings.get();
+    // final name = querySnapshot.docs.map((doc) => doc.get('name')).toList();
+    return await bookings
+        .add({
+          'service': _event.text,
+          'date_time': selectedDay.toString(),
+          'booker': user.displayName, 'id': user.uid
+
+          // 'date_time': DateFormat("yyyy-MM-dd").format(selectedDay)
+
+          // John Doe
+        })
+        .then((value) => print("Bookings Complete"))
+        .catchError((error) => print("Failed to add user: $error"));
   }
 }
