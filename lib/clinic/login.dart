@@ -40,23 +40,26 @@ class _LoginPageState extends State<LoginPage> {
           inputPassword(),
           formButton(),
           const Divider(),
-          GoogleAuthButton(
-            onPressed: () {
-              signInWithGoogle().then((value) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => homePage(),
-                  ),
-                );
-              });
-            },
-            darkMode: false, // if true second example
-            // isLoading: isLoading,
-            style: AuthButtonStyle(
-              iconColor: Color.fromARGB(255, 92, 255, 230),
-              // buttonType: ,
-              // iconType: iconType,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
+            child: GoogleAuthButton(
+              onPressed: () {
+                signInWithGoogle().then((value) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => homePage(),
+                    ),
+                  );
+                });
+              },
+              darkMode: false, // if true second example
+              // isLoading: isLoading,
+              style: AuthButtonStyle(
+                iconColor: Color.fromARGB(255, 92, 255, 230),
+                // buttonType: ,
+                // iconType: iconType,
+              ),
             ),
           ),
         ]),
@@ -105,26 +108,30 @@ class _LoginPageState extends State<LoginPage> {
       width: width,
       height: height,
       child: ElevatedButton(
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32),
-              ),
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32),
             ),
           ),
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              loginUser(_email.text, _password.text).then((value) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const homePage(),
-                  ),
-                );
-              });
-            }
-          },
-          child: const Text('เข้าสู่ระบบ')),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            loginUser(_email.text, _password.text).then((value) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const homePage(),
+                ),
+              );
+            });
+          }
+        },
+        child: const Text(
+          'เข้าสู่ระบบ',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
     );
   }
 

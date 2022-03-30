@@ -10,8 +10,8 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _username = TextEditingController();
-  final TextEditingController _company = TextEditingController();
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _age = TextEditingController();
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
@@ -19,7 +19,10 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register'),
+        title: Text(
+          'Register',
+          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        ),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
@@ -27,11 +30,14 @@ class _RegisterPageState extends State<RegisterPage> {
             Navigator.pop(context);
           },
         ),
-        backgroundColor: Color(0xff4338CA),
+        backgroundColor: Color.fromARGB(255, 102, 207, 211),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xff4338CA), Color(0xff6D28D9)],
+              colors: [
+                Color.fromARGB(255, 0, 222, 226),
+                Color.fromARGB(255, 5, 216, 216)
+              ],
               stops: [0.5, 1.0],
             ),
           ),
@@ -43,17 +49,17 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             children: [
               CustomInputFieldFb1(
-                hintText: "Username",
-                inputController: _username,
-                labelText: "Username",
+                hintText: "Name",
+                inputController: _name,
+                labelText: "Name",
               ),
               SizedBox(
                 height: 20,
               ),
               CustomInputFieldFb1(
-                hintText: "Company name",
-                inputController: _company,
-                labelText: "Company",
+                hintText: "Age",
+                inputController: _age,
+                labelText: "Age",
               ),
               SizedBox(height: 36),
               CustomInputFieldFb1(
@@ -74,8 +80,8 @@ class _RegisterPageState extends State<RegisterPage> {
               GradientButtonFb1(
                   text: "Register",
                   onPressed: () {
-                    registerUser(_username.text, _company.text, _email.text,
-                            _password.text)
+                    registerUser(
+                            _name.text, _age.text, _email.text, _password.text)
                         .then((value) => {
                               if (value != null)
                                 {print('add complete'), Navigator.pop(context)}
@@ -103,7 +109,7 @@ class CustomInputFieldFb1 extends StatelessWidget {
       required this.inputController,
       required this.hintText,
       required this.labelText,
-      this.primaryColor = Colors.indigo,
+      this.primaryColor = Colors.cyan,
       this.password})
       : super(key: key);
 
@@ -164,9 +170,9 @@ class GradientButtonFb1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xff4338CA);
-    const secondaryColor = Color(0xff6D28D9);
-    const accentColor = Color(0xffffffff);
+    const primaryColor = Color.fromARGB(255, 102, 207, 211);
+    const secondaryColor = Color.fromARGB(255, 102, 207, 211);
+    const accentColor = Color.fromARGB(255, 255, 255, 255);
 
     const double borderRadius = 15;
 

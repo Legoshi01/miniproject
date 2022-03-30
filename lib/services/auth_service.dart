@@ -6,7 +6,7 @@ FirebaseAuth auth = FirebaseAuth.instance; //auth on firebase
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 GoogleSignIn googleSignIn = GoogleSignIn();
-Future<UserCredential?> registerUser(name, company, email, password) async {
+Future<UserCredential?> registerUser(name, age, email, password) async {
   try {
     UserCredential userCredential = await auth.createUserWithEmailAndPassword(
       email: email,
@@ -17,8 +17,9 @@ Future<UserCredential?> registerUser(name, company, email, password) async {
     users
         .doc(userCredential.user!.uid)
         .set({
-          'full_name': name,
-          'company': company,
+          'name': name,
+          'age': age,
+          'email': email,
         })
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));

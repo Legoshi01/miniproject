@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../services/auth_service.dart';
+import 'login.dart';
 
 class homePage extends StatefulWidget {
   const homePage({Key? key}) : super(key: key);
@@ -23,15 +24,19 @@ class homePage extends StatefulWidget {
 class _homePageState extends State<homePage> {
   // ignore: non_constant_identifier_names
   CollectionReference bookings =
-      FirebaseFirestore.instance.collection('Services');
+      FirebaseFirestore.instance.collection('Bookings');
 
   late Map<DateTime, List<Event>> salectedEvents;
 
   CalendarFormat format = CalendarFormat.month;
-  final dateFormat = DateFormat('EEEE dd-MMMM-yyyy ');
+
+  final dateFormat = DateFormat('yyyy-MM-dd ');
+
+  // final dateFormat = DateFormat('yyyy-MM-dd');
   // final dateFormat =
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
+  // DateTime focusedDay = DateTime(focuseDay.year, focuseDay.month, focuseDay.day, focuseDay.hour, focuseDay.minute);
   // String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(focusedDay);
   // DateTime focusedDay = DateFormat.;
 
@@ -55,6 +60,8 @@ class _homePageState extends State<homePage> {
     super.dispose();
   }
 
+  final user = FirebaseAuth.instance.currentUser!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +70,25 @@ class _homePageState extends State<homePage> {
           "Clinic Booking",
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              googleSignOut().then((value) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginPage(),
+                  ),
+                );
+              });
+            },
+            icon: Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+          ),
+        ],
+        centerTitle: false,
       ),
       body: Container(
         child: ListView(
@@ -88,6 +113,8 @@ class _homePageState extends State<homePage> {
                   focusedDay = focusDay;
                 });
                 print(dateFormat.format(focusedDay));
+                // print(DateFormat("yyyy-MM-dd ").format(focusedDay));
+                // print(focusedDay.toString());
               },
               selectedDayPredicate: (DateTime date) {
                 return isSameDay(selectedDay, date);
@@ -123,7 +150,7 @@ class _homePageState extends State<homePage> {
                 titleCentered: true,
                 formatButtonShowsNext: false,
                 formatButtonDecoration: BoxDecoration(
-                  color: Color.fromARGB(255, 63, 83, 99),
+                  color: Color.fromARGB(255, 8, 94, 125),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 formatButtonTextStyle: TextStyle(
@@ -138,7 +165,7 @@ class _homePageState extends State<homePage> {
                 ),
               ),
             ),
-            showList(),
+            // showList(),
           ],
         ),
       ),
@@ -170,9 +197,8 @@ class _homePageState extends State<homePage> {
                               Event(title: _event.text)
                             ];
                           }
-
-                          // realgetdata();
                           createBookings();
+                          // realgetdata();
                         }
 
                         Navigator.pop(context);
@@ -185,7 +211,7 @@ class _homePageState extends State<homePage> {
                 ),
               ),
           label: Text(
-            "Add Event",
+            "Booking",
             style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
           ),
           icon: Icon(
@@ -218,10 +244,15 @@ class _homePageState extends State<homePage> {
   // }
 
   Future<void> createBookings() async {
+    //  QuerySnapshot querySnapshot = await bookings.get();
+    // final name = querySnapshot.docs.map((doc) => doc.get('name')).toList();
     return await bookings
         .add({
           'service': _event.text,
-          'date_time': dateFormat.format(selectedDay).toString()
+          'date_time': selectedDay.toString(),
+          'booker': user.displayName, 'id': user.uid
+
+          // 'date_time': DateFormat("yyyy-MM-dd").format(selectedDay)
 
           // John Doe
         })
@@ -229,24 +260,28 @@ class _homePageState extends State<homePage> {
         .catchError((error) => print("Failed to add user: $error"));
   }
 
-  // Future<void> getData() async {
-  //   // Get docs from collection reference
-  //   QuerySnapshot querySnapshot = await bookings.get();
+  Future<void> showdata() async {
+    // Get docs from collection reference
+    QuerySnapshot querySnapshot = await bookings.get();
 
-  //   // Get data from docs and convert map to List
-  //   final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    // Get data from docs and convert map to List
+    final datee =
+        querySnapshot.docs.map((doc) => doc.get('date_time')).toList();
+    final serv = querySnapshot.docs.map((doc) => doc.get('service')).toList();
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
 
-  //   for (int i = 0; i < querySnapshot.size; i++) {
-  //     // var a = allData[i];
-  //     // print(a.documentID);
-  //     salectedEvents[selectedDay] = [Event(title: _event.text)];
+    for (int i = 0; i < querySnapshot.size; i++) {
+      Card(
+        child: ListTile(
+          title: Text(serv[i]),
+          subtitle: Text(datee[i]),
+        ),
+      );
+      print(allData[i]);
+    }
 
-  //     print(allData[i]);
-  //     // print('${{a}.['service']}');
-  //   }
-
-  //   // print(allData);
-  // }
+    // print(allData);
+  }
 
   // Future<void> getdata() async {
   //   // Get docs from collection reference
@@ -266,28 +301,33 @@ class _homePageState extends State<homePage> {
     QuerySnapshot querySnapshot = await bookings.get();
 
     // final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
-    var date = querySnapshot.docs.map((doc) => doc.get('date_time')).toList();
+    final datee =
+        querySnapshot.docs.map((doc) => doc.get('date_time')).toList();
     final serv = querySnapshot.docs.map((doc) => doc.get('service')).toList();
+    final Uid = querySnapshot.docs.map((doc) => doc.get('id')).toList();
     // var datetime = DateTime.parse(date);
 
     for (int i = 0; i < querySnapshot.size; i++) {
-      DateTime conDate = DateTime.parse(date[i].toString());
-      if (salectedEvents[conDate] != null) {
-        salectedEvents[conDate]?.add(
-          Event(title: serv[i]),
-        );
-      } else {
-        salectedEvents[conDate] = [Event(title: serv[i])];
-      }
+      DateTime conDate = DateTime.parse(datee[i]);
+      if (Uid[i] == user.uid) {
+        if (salectedEvents[conDate] != null) {
+          salectedEvents[conDate]?.add(
+            Event(title: serv[i]),
+          );
+        } else {
+          salectedEvents[conDate] = [Event(title: serv[i])];
+        }
 
-      // print(serv[i].toString());
+        print(conDate);
+        print(serv[i].toString());
+      } else {}
     }
     setState(() {});
   }
 
   Widget showList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('Services').snapshots(),
+      stream: FirebaseFirestore.instance.collection('Bookings').snapshots(),
       builder: (context, snapshot) {
         List<Widget> myList;
 
@@ -302,8 +342,10 @@ class _homePageState extends State<homePage> {
                 Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
                 return Card(
                   child: ListTile(
-                    title: Text('${data['service']}'),
+                    title: Text('${data['booker']}'),
                     subtitle: Text('${data['date_time']}'),
+
+                    // subtitle: Text(data.),
                   ),
                 );
                 // ignore: dead_code
