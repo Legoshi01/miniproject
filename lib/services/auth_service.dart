@@ -14,13 +14,10 @@ Future<UserCredential?> registerUser(name, age, email, password) async {
     );
     CollectionReference users = FirebaseFirestore.instance.collection('Users');
 
+    final user = FirebaseAuth.instance.currentUser!;
     users
         .doc(userCredential.user!.uid)
-        .set({
-          'name': name,
-          'age': age,
-          'email': email,
-        })
+        .set({'name': name, 'age': age, 'email': email, 'id': user.uid})
         .then((value) => print("User Added"))
         .catchError((error) => print("Failed to add user: $error"));
     return userCredential;

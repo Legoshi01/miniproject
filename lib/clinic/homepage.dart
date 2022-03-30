@@ -14,6 +14,7 @@ import '../models/service_list.dart';
 import '../models/service_list.dart';
 import '../services/auth_service.dart';
 import 'login.dart';
+import 'update.dart';
 
 class homePage extends StatefulWidget {
   const homePage({Key? key}) : super(key: key);
@@ -91,25 +92,25 @@ class _homePageState extends State<homePage> {
           "Clinic Booking",
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              googleSignOut().then((value) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
-                  ),
-                );
-              });
-            },
-            icon: Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-          ),
-        ],
-        centerTitle: false,
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {
+        //       googleSignOut().then((value) {
+        //         Navigator.pushReplacement(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (context) => const LoginPage(),
+        //           ),
+        //         );
+        //       });
+        //     },
+        //     icon: Icon(
+        //       Icons.logout,
+        //       color: Colors.white,
+        //     ),
+        //   ),
+        // ],
+        centerTitle: true,
       ),
       body: Container(
         child: ListView(
@@ -189,7 +190,7 @@ class _homePageState extends State<homePage> {
       drawer: Drawer(
         // backgroundColor: Colors.white,
         child: ListView(
-          padding: EdgeInsets.zero,
+          // padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
@@ -209,6 +210,20 @@ class _homePageState extends State<homePage> {
             //       fontSize: 24,
             //     )),
             ListTile(
+              leading: Icon(
+                Icons.create_outlined,
+                color: Color.fromARGB(255, 79, 211, 196),
+              ),
+              title: Text('Edit Information'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Editprofile(),
+                    )).then((value) => setState(() {}));
+              },
+            ),
+            ListTile(
                 leading: Icon(
                   Icons.logout,
                   color: Color.fromARGB(255, 79, 211, 196),
@@ -224,17 +239,7 @@ class _homePageState extends State<homePage> {
                     );
                   });
                 }),
-            // ListTile(
-            //   leading: Icon(Icons.library_books_rounded),
-            //   title: Text('ItemCalories'),
-            //   onTap: () {
-            //     Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //           builder: (context) => const ItemCalories(),
-            //         )).then((value) => setState(() {}));
-            //   },
-            // ),
+
             // ListTile(
             //   leading: Icon(Icons.login_outlined),
             //   title: Text('log Out'),

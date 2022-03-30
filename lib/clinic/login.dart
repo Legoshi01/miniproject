@@ -39,26 +39,28 @@ class _LoginPageState extends State<LoginPage> {
           inputEmail(),
           inputPassword(),
           formButton(),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-            child: GoogleAuthButton(
-              onPressed: () {
-                signInWithGoogle().then((value) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => homePage(),
-                    ),
-                  );
-                });
-              },
-              darkMode: false, // if true second example
-              // isLoading: isLoading,
-              style: AuthButtonStyle(
-                iconColor: Color.fromARGB(255, 92, 255, 230),
-                // buttonType: ,
-                // iconType: iconType,
+          // const Divider(),
+          Container(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(30, 5, 30, 5),
+              child: GoogleAuthButton(
+                onPressed: () {
+                  signInWithGoogle().then((value) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => homePage(),
+                      ),
+                    );
+                  });
+                },
+                darkMode: false, // if true second example
+                // isLoading: isLoading,
+                style: AuthButtonStyle(
+                  iconColor: Color.fromARGB(255, 92, 255, 230),
+                  // buttonType: ,
+                  // iconType: iconType,
+                ),
               ),
             ),
           ),
@@ -98,7 +100,11 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         },
-        child: const Text('สมัครสมาชิก'),
+        child: const Text('สมัครสมาชิก',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 102, 207, 211))),
       ),
     );
   }
@@ -129,7 +135,8 @@ class _LoginPageState extends State<LoginPage> {
         },
         child: const Text(
           'เข้าสู่ระบบ',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
