@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'homepage.dart';
+
 class Editprofile extends StatefulWidget {
   const Editprofile({Key? key}) : super(key: key);
 
@@ -17,6 +19,9 @@ class _EditprofileState extends State<Editprofile> {
   final user = FirebaseAuth.instance.currentUser!;
   TextEditingController Sname = TextEditingController();
   final TextEditingController age = TextEditingController();
+
+  // TextEditingController Sname = Null as TextEditingController;
+  // TextEditingController age = Null as TextEditingController;
   // final TextEditingController _height = TextEditingController();
 
   CollectionReference bookings = FirebaseFirestore.instance.collection('Users');
@@ -36,15 +41,23 @@ class _EditprofileState extends State<Editprofile> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        title: const Text('Edit Information',
-            style: TextStyle(color: Colors.white)),
+        title:
+            const Text('Edit Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const homePage(),
+                ),
+              );
+            },
+            icon: Icon(Icons.logout),
+          ),
+        ],
+        automaticallyImplyLeading: false,
         backgroundColor: Color.fromARGB(255, 79, 211, 196),
       ),
       body: SingleChildScrollView(
@@ -72,7 +85,7 @@ class _EditprofileState extends State<Editprofile> {
                 obscureText: false,
                 controller: Sname,
                 validator: (vaLue) {
-                  if (vaLue!.isEmpty) {
+                  if (vaLue!.isEmpty || vaLue == null) {
                     return "Please enter your name";
                   }
                   return null;
@@ -80,7 +93,7 @@ class _EditprofileState extends State<Editprofile> {
                 decoration: InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
-                    labelText: Sname.text,
+                    labelText: 'Name',
                     prefixIcon: Icon(
                       Icons.person_pin_circle_rounded,
                       color: Colors.teal[400],
@@ -98,7 +111,7 @@ class _EditprofileState extends State<Editprofile> {
                 obscureText: false,
                 controller: age,
                 validator: (vaLue) {
-                  if (vaLue!.isEmpty) {
+                  if (vaLue!.isEmpty || vaLue == null) {
                     return "Please enter your age";
                   }
                   return null;
@@ -144,14 +157,15 @@ class _EditprofileState extends State<Editprofile> {
                             'age': age.text,
                             // 'height': _height.text,
                           })
-                          .then((value) => print("User Added"))
+                          .then((value) => print("Updated"))
                           .catchError(
                               (error) => print("Failed to add user: $error"));
+
                       showDialog<String>(
                         context: context,
                         builder: (BuildContext context) => AlertDialog(
-                          title: const Text('แก้ไขโปรไฟล์'),
-                          content: const Text('แก้ไขข้อมูลเรียบร้อยเเล้ว'),
+                          title: const Text('Edit Profile'),
+                          content: const Text('Edited'),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () => Navigator.pop(context, 'OK'),
@@ -163,6 +177,7 @@ class _EditprofileState extends State<Editprofile> {
                       const SizedBox(
                         width: 8,
                       );
+                      setState(() {});
                     },
                   )),
             ],
@@ -184,7 +199,7 @@ class _EditprofileState extends State<Editprofile> {
 
     for (int i = 0; i < querySnapshot.size; i++) {
       if (_Uid[i] == current.uid) {
-        _name[i];
+        Sname = _name as TextEditingController;
         print(Sname);
       }
     }

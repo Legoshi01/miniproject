@@ -1,103 +1,85 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../clinic/login.dart';
-import '../services/auth_service.dart';
-import 'add_product.dart';
-import 'edit_product.dart';
+import 'homepage.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({
-    Key? key,
-  }) : super(key: key);
+class read_deletePage extends StatefulWidget {
+  const read_deletePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<read_deletePage> createState() => _read_deletePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+// final user = FirebaseAuth.instance.currentUser!;
+
+class _read_deletePageState extends State<read_deletePage> {
+  final user = FirebaseAuth.instance.currentUser!;
+
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser!;
-    // final user = FirebaseAuth.instance.currentUser!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Homepage'),
+        title:
+            const Text('Cancle Booking', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
-              googleSignOut().then((value) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
-                  ),
-                );
-              });
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const homePage(),
+                ),
+              );
             },
             icon: Icon(Icons.logout),
           ),
         ],
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Text('${user.email}'),
-            Text('${user.displayName}'),
             showList(),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Move to Add Product Page
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddProductPage(),
-              )).then((value) => setState(() {}));
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget showList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('Products').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('Bookings')
+          .where('id', isEqualTo: user.uid)
+          .snapshots(),
       builder: (context, snapshot) {
         List<Widget> myList;
 
         if (snapshot.hasData) {
           // Convert snapshot.data to jsonString
-          var products = snapshot.data;
+          var booking = snapshot.data;
 
           // Define Widgets to myList
           myList = [
             Column(
-              children: products!.docs.map((DocumentSnapshot doc) {
+              children: booking!.docs.map((DocumentSnapshot doc) {
                 Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+
                 return Card(
                   child: ListTile(
-                    onTap: () {
-                      // Navigate to Edit Product
-
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditProductPage(id: doc.id),
-                          )).then((value) => setState(() {}));
-                    },
-                    title: Text('${data['product_name']}'),
-                    subtitle: Text('${data['price']}'),
+                    onTap: () {},
+                    title: Text('${data['service']}'),
+                    subtitle: Text('${data['date_time']}'),
                     trailing: IconButton(
                       onPressed: () {
                         // Create Alert Dialog
                         var alertDialog = AlertDialog(
-                          title: const Text('Delete Product Confirmation'),
+                          title: const Text('Delete Booking?'),
                           content: Text(
-                              'คุณต้องการลบสินค้า ${data['product_name']} ใช่หรือไม่'),
+                              'คุณต้องการยกเลิกการจองวันที่ ${data['date_time']} \nใช่หรือไม่'),
                           actions: [
                             TextButton(
                                 onPressed: () => Navigator.pop(context),
@@ -105,6 +87,7 @@ class _HomePageState extends State<HomePage> {
                             TextButton(
                                 onPressed: () {
                                   deleteProduct(doc.id);
+                                  setState(() {});
                                 },
                                 child: const Text('ยืนยัน')),
                           ],
@@ -115,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                             builder: (context) => alertDialog);
                       },
                       icon: const Icon(
-                        Icons.delete_forever,
+                        Icons.delete,
                         color: Colors.red,
                       ),
                     ),
@@ -160,8 +143,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> deleteProduct(String? id) {
+    //  if(user.uid!=id){
+    //    exit()
+    //  }
+
     return FirebaseFirestore.instance
-        .collection('Products')
+        .collection('Bookings')
         .doc(id)
         .delete()
         .then((value) => Navigator.pop(context))

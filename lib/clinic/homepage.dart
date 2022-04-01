@@ -1,5 +1,6 @@
 // import 'dart:html';
 
+import 'package:demofirebase124/clinic/read&delete.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/service_list.dart';
 import '../models/service_list.dart';
 import '../services/auth_service.dart';
+import 'editBooking.dart';
 import 'login.dart';
 import 'update.dart';
 
@@ -28,6 +30,7 @@ late List<DropdownMenuItem<Listservice>> dropdownMenuItems;
 late Listservice _selectedType;
 
 class _homePageState extends State<homePage> {
+  String? accountName;
   // ignore: non_constant_identifier_names
   CollectionReference bookings =
       FirebaseFirestore.instance.collection('Bookings');
@@ -69,8 +72,26 @@ class _homePageState extends State<homePage> {
     salectedEvents = {};
     super.initState();
     dropdownMenuItems = createDropdownMenu(dropdownItems);
-    _selectedType = dropdownMenuItems[0].value!;
+
+    setState(() {
+      _selectedType = dropdownMenuItems[0].value!;
+    });
     realgetdata();
+    findDisplayName();
+  }
+
+  Future<Null> findDisplayName() async {
+    await FirebaseAuth.instance.authStateChanges().listen((event) {
+      setState(() {
+        if (event?.displayName != null) {
+          setState(() {
+            accountName = event?.displayName.toString();
+          });
+        }
+      });
+      // print(event!.displayName.toString());
+      // print('====== $accountName');
+    });
   }
 
   List<Event> _getEventsfromDay(DateTime date) {
@@ -83,6 +104,7 @@ class _homePageState extends State<homePage> {
   }
 
   final user = FirebaseAuth.instance.currentUser!;
+  CollectionReference info = FirebaseFirestore.instance.collection('Users');
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +219,7 @@ class _homePageState extends State<homePage> {
                 color: Color.fromARGB(255, 79, 211, 196),
               ),
               child: Text(
-                user.displayName.toString(),
+                accountName.toString(),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -214,12 +236,40 @@ class _homePageState extends State<homePage> {
                 Icons.create_outlined,
                 color: Color.fromARGB(255, 79, 211, 196),
               ),
-              title: Text('Edit Information'),
+              title: Text('Edit Profile'),
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const Editprofile(),
+                    )).then((value) => setState(() {}));
+              },
+            ),
+            // ListTile(
+            //   leading: Icon(
+            //     Icons.event,
+            //     color: Color.fromARGB(255, 79, 211, 196),
+            //   ),
+            //   title: Text('Edit Booking'),
+            //   onTap: () {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => const editbooking(),
+            //         )).then((value) => setState(() {}));
+            //   },
+            // ),
+            ListTile(
+              leading: Icon(
+                Icons.restore_from_trash,
+                color: Color.fromARGB(255, 79, 211, 196),
+              ),
+              title: Text('Cancle Booking'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const read_deletePage(),
                     )).then((value) => setState(() {}));
               },
             ),
@@ -240,27 +290,16 @@ class _homePageState extends State<homePage> {
                   });
                 }),
 
-            // ListTile(
-            //   leading: Icon(Icons.login_outlined),
-            //   title: Text('log Out'),
-            //   onTap: () {
-            //     Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //           builder: (context) => const LoginPage(),
-            //         )).then((value) => setState(() {}));
-            //   },
+            const Divider(),
+            // Expanded(
+            //   child: Align(
+            //     alignment: Alignment.bottomLeft,
+            //     child: ListTile(
+            //       title: Text('Item 3'),
+            //       onTap: () {},
+            //     ),
+            //   ),
             // ),
-            // const Divider(),
-            // // Expanded(
-            // //   child: Align(
-            // //     alignment: Alignment.bottomLeft,
-            // //     child: ListTile(
-            // //       title: Text('Item 3'),
-            // //       onTap: () {},
-            // //     ),
-            // //   ),
-            // // ),
           ],
         ),
       ),
@@ -268,17 +307,15 @@ class _homePageState extends State<homePage> {
           onPressed: () => showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text("Add Event"),
-                  content: DropdownButton(
-                    borderRadius: const BorderRadius.all(Radius.circular(16)),
+                  title: Text("Choose Service"),
+                  content: DropdownButtonFormField(
+                    // borderRadius: const BorderRadius.all(Radius.circular(16)),
                     value: _selectedType,
                     items: dropdownMenuItems,
                     onChanged: (value) {
-                      setState(() {
-                        _selectedType = value as Listservice;
-                        print(_selectedType.name);
-                        setState(() {});
-                      });
+                      _selectedType = value as Listservice;
+                      print(_selectedType.name);
+                      setState(() {});
                     },
                   ),
                   actions: [
@@ -321,7 +358,7 @@ class _homePageState extends State<homePage> {
             style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
           ),
           icon: Icon(
-            Icons.add,
+            Icons.event_outlined,
             color: Colors.white,
           )),
     );
@@ -370,9 +407,22 @@ class _homePageState extends State<homePage> {
   }
 
   Future<void> realgetdata() async {
-    QuerySnapshot querySnapshot = await bookings.get();
+    QuerySnapshot infos = await info.get();
+    final ids = infos.docs.map((doc) => doc.get('id')).toList();
+
+    final names = infos.docs.map((doc) => doc.get('name')).toList();
+    for (int i = 0; i < infos.size; i++) {
+      if (ids[i] == user.uid) {
+        accountName = names[i] as String;
+
+        // print(names[i]);
+        // print(user.displayName);
+      }
+    }
 
     // final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+    // QuerySnapshot querySnapshot = await bookings.get();
+    QuerySnapshot querySnapshot = await bookings.get();
     final datee =
         querySnapshot.docs.map((doc) => doc.get('date_time')).toList();
     final serv = querySnapshot.docs.map((doc) => doc.get('service')).toList();
@@ -390,8 +440,8 @@ class _homePageState extends State<homePage> {
           salectedEvents[conDate] = [Event(title: serv[i])];
         }
 
-        print(conDate);
-        print(serv[i].toString());
+        // print(conDate);
+        // print(serv[i].toString());
       } else {}
     }
     setState(() {});

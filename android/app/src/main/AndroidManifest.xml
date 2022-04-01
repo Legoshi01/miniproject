@@ -2,7 +2,7 @@
     package="io.yaseen.csdev.demofirebase124">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="SeenProduct"
+        android:label="DentalBooking"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

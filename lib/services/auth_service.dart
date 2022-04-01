@@ -54,6 +54,9 @@ Future loginUser(email, password) async {
 Future<UserCredential> signInWithGoogle() async {
   // Trigger the authentication flow
   final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+  // CollectionReference users = FirebaseFirestore.instance.collection('Users');
+
+  // final user = FirebaseAuth.instance.currentUser!;
 
   // Obtain the auth details from the request
   final GoogleSignInAuthentication? googleAuth =
@@ -67,7 +70,13 @@ Future<UserCredential> signInWithGoogle() async {
 
   // Once signed in, return the UserCredential
   UserCredential userCredential = await auth.signInWithCredential(credential);
-  print(userCredential.user);
+
+  // users
+  //     .doc(user.uid)
+  //     .update({'name': user.displayName, 'id': user.uid})
+  //     .then((value) => print("User Added"))
+  //     .catchError((error) => print("Failed to add user: $error"));
+  // print(userCredential.user);
   return userCredential;
 }
 
